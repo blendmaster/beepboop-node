@@ -1,0 +1,68 @@
+***********************************
+
+Server -> Client responses
+
+Initial Authentication
+======================
+
+type				argument					for
+handshake			User						indicates client now is User
+
+Server Pushes
+====================
+Can come at any time. the Client should update its state to reflect the push. 
+The server doesn't know the client's state, so it's up to the client to decide
+whether to notify the user if something actually changed or not.
+
+type				argument					for
+pushChatroom		Chatroom					info about Chatroom. Client should add the Chatroom to its
+												chatroom list.
+pushChatroomProp	chatroom, property			property of the chatroom. If the client doesn't have the
+												chatroom on its list, it should ignore it.
+pushPrivate			Chatroom, user				returns the best choice private chatroom with user and client
+pushUser			User						returns user's info available to client. It will lie
+												if the user is invisible/notfriends.
+pushUserProp		user, property				returns new property of user. 
+
+pushBuddy			User						indicates Buddy has been added to user's list.
+												Client should update its list.
+pushBuddyRequest	User, message				pushes new buddyRequest from user with message
+
+pushMessage			Message						indicates new/changed message (message contains room info)	
+												client is expected to compare id to existing messages
+												and change redacted/edited status to match
+												server will expect an acknowledgement by the client
+												for each message sent
+							
+Message Acknowlegement
+======================
+
+type				argument					for
+ackMessage			Message, tempid				acknowledges server got message sent with tempid
+												server will not double-send the message with
+												pushMessage to the client that sent it.
+												the client is expected to update its state to
+												recieve the Message properly.
+												
+Server Notices
+==============
+Notice that something happened. The client's state should not have to be updated.
+kick and ban notices will be accompanied by an updated chatroom userlist push.
+
+type				argument						for
+kick				chatroom, user, reason			indicates kicked user from chatroom for reason
+ban					chatroom, user, reason			indicates banned user from chatroom for reason
+message				text							indicates serverwide message with text
+list				chatrooms						returns list of public chatroom names, topics, and activeusers
+
+Server Errors
+=============
+indicates that the Request met the specified error.
+
+type				argument						for
+errorBanned			Request							can't do Request because you are banned from the chatroom.
+errorNotInList		Request							can't do Request because the chatroom/user is not in your lists
+errorPrivilege		Request							indicates Request could not be met due to insufficient privilege
+errorExistence		Request							indicates Request could not be met due to User/Message/Chatroom not existing
+errorMalformed		Request							indicates your Request couldn't be processed.
+errorNoHandshake	Request							indicates client must handshake before making this request.

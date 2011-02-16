@@ -1,0 +1,144 @@
+Chat server protocol 0.1
+
+Requests from client to server
+
+Type		What				arguments						for
+=================================================================================================
+handshake	handshake			user							tries to link current client with user object.
+
+get			Chatrooms			chatroom						asks for list of public chatroom names
+get			Chatroom			chatroom						asks for all chatroom data
+get			ChatroomName		chatroom						asks for just chatroom name
+get			ChatroomTopic		chatroom						asks for just chatroom topic
+get			ChatroomUsers		chatroom						asks for just chatroom users names
+get			ChatroomHistory		chatroom, time					asks for history newer than time
+get			ChatroomAdmins		chatroom						asks for list of chatroom's admins
+get			ChatroomMods		chatroom						asks for list of chatroom's mods
+get			ChatroomBans		chatroom						asks for chatroom's banlist
+
+get			User				user							asks for public user info
+get			UserPrivateChat		user							asks for the special private chatroom with user and you
+get			UserNick			user							asks for user's current nick
+get			UserStatus			user							asks for user status (idle, away, offline)
+get			UserRoomStatus		user, chatroom					asks's for user's room status in room (typing, watching, not watching)
+get			UserPrivilege		user, chatroom					asks for user's privelege in chatroom
+
+get			Message				chatroom, message				asks for message in chatroom
+
+ack			Message				message							acknowledges client recieved message
+
+get			MyUser				none							asks for client's user info
+get			MyUserNick			none							asks for client's user nick
+get			MyUserStatus		none							asks for client's user status
+get			MyUserRoomStatus	chatroom						asks for clients room status in room
+get			MyUserBuddylist		none							asks for client's buddylist
+get			MyUserChatrooms		none							asks for client's chatroom list
+get			MyUserPrivilege		chatroom						asks for client's privilege in chatroom
+get			MyInvites			none							asks for client's invites
+get			MyUnread			none							asks for client's unread messages
+
+new			Chatroom			newName,isPrivate				asks for new chatroom with newName, with specified privateness
+new			Message				chatroom, text					requests the message with text be put in chatroom
+new			Invite				chatroom, user, text			asks to send invite to name for chatroom with text
+new			BuddyRequest		user							asks user to become friends
+delete		Buddy				user							removes user from buddylist
+delete		Chatroom			chatroom						leaves chatroom, and removes Chatroom from list
+
+deny		BuddyRequest		user							denies user's BuddyRequest
+accept		BuddyRequest		user							accept's user's BuddyRequest
+
+change		ChatroomTopic		chatroom, newTopic				requests room's topic to be changed
+change		ChatroomType		isPrivate						requests chatroom to be made public/private
+
+change		MyStatus			newStatus						requests client's status to be changed
+change		MyRoomStatus		newRoomStatus					requests client's room status to be change
+change		MyNick				newNick							requests client's nick to be changed
+change		MyPrivilege			chatroom, newPrivilege			requests client's privilege in chatroom to be changed
+
+change		UserPrivilege		user, chatroom, newPrivilege	requests user in room's privilege to be changed
+
+edit		Message				chatroom, msg, text				requests to edit id in chatroom to text
+redact		Message				chatroom, msg					requests to redact message in chatroom
+
+ban			User				user, chatroom, reason			requests to ban user from chatroom, for reason
+kick		User				user, chatroom, reason			requests to kick user from chatroom, for reason
+
+join		Chatroom			chatroom						requests to join chatroom
+
+quit		Server				reason							indicates that this client is quitting for reason
+	
+*****
+
+Responses from server to client
+
+Type		What				data							for
+=================================================================================================
+handshake	handshake			User							indicating handshake success to user (returns user data)
+
+got			Chatrooms			chatroom						sends list of chatroom names
+got			Chatroom			chatroom						sends all chatroom data
+got			ChatroomName		chatroom						sends just chatroom name
+got			ChatroomTopic		chatroom						sends just chatroom topic
+got			ChatroomUsers		chatroom						sends just chatroom users names
+got			ChatroomHistory		chatroom						sends requested history
+got			ChatroomAdmins		chatroom						sends list of chatroom's admins
+got			ChatroomMods		chatroom						sends list of chatroom's mods
+got			ChatroomBans		chatroom						sends chatroom's banlist
+
+got			User				user							sends public user info
+got			UserPrivateChat		chatroom, user					sends the special private chatroom with user and client
+got			UserNick			user							sends user's current nick
+got			UserStatus			user							sends user status (idle, away, offline)
+got			UserRoomStatus		user, chatroom					sends user's room status in room (typing, watching, not watching)
+got			UserPrivilege		user, chatroom					sends user's privelege in chatroom
+
+got			Message				chatroom, id					sends message in chatroom
+
+got			MyUser				user							sends client's user info
+got			MyUserNick			nick							sends client's user nick
+got			MyUserStatus		status							sends client's user status
+got			MyUserRoomStatus	status, chatroom				sends clients room status in room
+got			MyUserBuddylist		list							sends client's buddylist
+got			MyUserChatrooms		list							sends client's chatroom list
+got			MyUserPrivilege		privilege, chatroom				sends client's privilege in chatroom
+got			MyInvites			list							sends client's invites
+got			MyUnread			messages						sends client's unread messages
+
+new			Chatroom			chatroom						indicates you are now in a new chatroom (return entire new chatroom
+new			Message				msg, chatroom					indicates new Message in chatroom
+new			Invite				chatroom, user, text			indicates new Invite to chatroom by user with text
+new			BuddyRequest		user							indicates new request from user to become friends
+new			Buddy				user							indicates user accepted your request		
+
+change		ChatroomTopic		chatroom, topic					indicate topic change to topic in chatroom
+change		ChatroomType		isPrivate						indicates chatroom changing to private/public
+
+change		MyStatus			newStatus						indicates your status changed to newStatus
+change		MyRoomStatus		newRoomStatus					indicates your room status changed
+change		MyNick				newNick							indicates your nick's change to new nick
+change		MyPrivilege			chatroom, newPrivilege			indicates change to new privilege in room
+
+change		UserPrivilege		chatroomroom, newPrivilege		indicates change for user's privilege in room
+change		UserStatus			user, newStatus					indicates change in user's status to newStatus
+change 		UserRoomStatus		user, chatroom, newStatus		indicates change in user's status in room
+
+edited		Message				chatroom, msg					indicates msg in chatroom edited
+redacted	Message				chatroom, msg					indicates msg in chatroom redacted
+
+banned		User				user, chatroom, reason			indicates banning of user from chatroom
+kicked		User				user, chatroom, reason			indicates kicking of user from chatroom
+
+notice		Server				text							indicates new text from server
+notice		Chatroom			chatroom, text					indicates new text for chatroom
+
+notice		Kicked				chatroom, reason				indicates you were kicked from chatroom for reason
+notice		Banned				chatroom, reason				indicates you were banned from chatroom for reason
+
+error		Malformed			Request							indicates the Request recieved was malformed
+error		Banned				Request							indicates you are banned from doing Request
+error		NotPrivliged		Request							indicates insufficient privilege for Request
+error		NotFriends			Request							indicates Request to get user's info was denied
+error		NotAUser			Request							request failed because user doesn't exist
+error		NotAMessage			Request							request failed because message doesn't exist
+error		NotAChatroom		Request							request failed because chatroom doesn't exist
+error		NoHandshake			Request							you need to handshake first

@@ -1,0 +1,1 @@
+A little chat server written in node.js. It uses a JSON-based protocol of my own design. for kicks.
