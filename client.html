@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+<head>
+<link rel='stylesheet' href="html5reset-1.6.1.css" \>
+<script src="jquery-1.5.min.js"></script>
+<script src="http://localhost:8000/socket.io/socket.io.js"></script>
+<title>Socket.IO test</title>
+</head>
+<body>
+
+<header>
+	<h1>Chat Server Maybe!</h1>
+</header>
+<div id="messages">
+	<p>messages will appear here!</p>
+</div>
+<div id="inputter">
+	<input id="username" value="username" \>	
+	<input id="textbox" value="send messages here!" \>
+	<button type="button" id="send" >Send</button>
+</div>
+
+<script> 
+var socket = new io.Socket("localhost",{port:8000}); 
+
+socket.connect();
+
+function add(msg) {
+	$("#messages").append("<p>" + msg + "</p>");
+}
+
+socket.on('connect', function(){ add("connected!"); });
+socket.on('message', function(message){ add(message);});
+socket.on('disconnect', function(){ add("disconnected ._."); });
+
+$("#textbox").keypress( function (event) {
+	if (event.which == '13') {
+		socket.send( $("#username").val() + ": " + $("#textbox").val() ); //broadcast message
+		add( $("#username").val() + ": " + $("#textbox").val() ); //add message to screen
+		$("#textbox").val( "" ); //clear textbox
+	}
+});
+
+$("#send").click( function () {
+	socket.send( $("#username").val() + ": " + $("#textbox").val() ); //broadcast message
+	add( $("#username").val() + ": " + $("#textbox").val() ); //add message to screen
+	$("#textbox").val( "" ); //clear textbox
+});
+
+//clear boxes when clicked
+var defaultUsername = "username";
+var defaultMessage = "send messages here!";
+$("#username").focus( function () {
+	if( $(this).val() == defaultUsername ) {
+		$(this).val( "" );
+	}
+});
+$("#textbox").focus( function () {
+	if( $(this).val() == defaultMessage ) {
+		$(this).val( "" );
+	}
+});
+
+</script> 
+</body>
+</html>

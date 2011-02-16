@@ -1,0 +1,97 @@
+Chat server protocol 0.2
+
+Client -> Server requests
+
+Initial Authentication
+======================
+
+type				argument						for
+handshake			username						requests to authenticate as username
+
+Information Requests
+====================
+Server will only send error messages. If the request is granted,
+It will be a regular server push, or a notice, in the case of the list Request.
+
+type				argument						for
+getChatroom			chatroom,[property]				requests info about chatroom, or just the property
+getPrivate			user							requests the private chatroom between you and user
+													The room is created when the users become friends.
+													if the room is converted to public, or gains more users,
+													then the server will return a new private chatroom.
+getUser				user,[property]					requests info about user, or just the property
+getHistory			chatroom, time, [last]			requests the messages newer than time in chatroom,
+													and older than last
+list				none							requests list of public chatrooms from server
+
+
+Message Requests/Acknowlegement
+===============================
+server will acknowledge the message was recieved by its tempid and chatroom
+or indicate the error generated. 
+
+Client sends ack to tell the server that the message with id was recieved properly.
+
+The real message id is assigned on the server, along with the timestamp.
+The client only sends the text, which will be sanitized by the server.
+The tempid is only for the client and acknowledgement use, and it is up to the
+client to keep it unique.
+
+type				argument						for
+sendMessage			chatroom, tempid, text			sends message with text and tempid to chatroom
+editMessage			chatroom, id, newtext			requests to edit message in chatroom with id to newtext
+redactMessage		chatroom, id					requests to redact message in chatroom with id
+ackMessage			chatroom, id					acknowledges client recieved message with id in chatroom
+													also marks message read on server. The client can have its
+													own unread counts.
+												
+New Requests
+============
+Server will only send error messages. If the change happens, it will come as a regular server push.
+
+type				argument						for
+newChatroom			chatroom, [private]				requests chatroom be added to user's list.
+													if the room exists it will be added, if not it will be created and added
+newInvite			chatroom, user					requests invite to user to chatroom be sent
+newBuddy			user, message					sends request to become friends with user with message
+
+Delete Requests
+===============
+Server will not send error or success messages. If the server doesn't push the updated state, the client
+can send the request again.
+
+type				argument						for
+deleteChatroom		chatroom						removes chatroom from user's list
+deleteBuddy			user							removes user from user's list
+
+
+Client Responses (technically still sent as requests)
+===================================
+responds to things that need client response
+
+type				argument						for
+acceptBuddy			user							accepts user's friend request
+denyBuddy			user							deny's user's friend request
+													the user will not be notified.
+
+Change Requests
+===============
+Server will only send error messages. If the change happens, it will come as a regular server push.
+
+type				argument						for
+changeTopic			chatroom, newtopic				requests to change room topic
+changeRoom			chatroom, privacy				requests to change room privacy
+changeVoice			chatroom, voice					requests to mod/unmod chatroom
+changeNick			newNick							requests user's change to newNick
+changeStatus		newStatus						updates this user's status
+changeRoomStatus	chatroom, newStatus				updates this user's status in chatroom
+changePrivilege		chatroom, user, newprivilege	tries to change user's privilege in chatroom
+
+User Change Requests
+====================
+Server will only send error messages. If the change happens, it will come as a regular server push.
+
+type				argument						for
+kick				chatroom, user, reason			tries to kick user from chatroom for reason
+ban					chatroom, user, reason			tries to ban user from chatroom for reason
+

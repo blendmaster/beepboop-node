@@ -1,0 +1,33 @@
+class Message
+	var id;
+	var text;
+	var username;
+	var chatroom;
+	
+	var timestamp;
+	var isEdited;
+	var isRedacted;
+	
+	Message( text, username, chatroom ) {
+		id = new Date().getTime();
+		text = text;
+		username = username;
+		chatroom = chatroom;
+		timestamp = new Date();
+		isEdited = false;
+		isRedacted = false;
+		
+	}
+	
+	edit( text ) {
+		isEdited = true;
+		text = text;
+		timestamp = new Date();
+	}
+	
+	redact() {
+		isRedacted = true;
+		isEdited = false;
+		text = '';
+	}
+	

@@ -1,0 +1,66 @@
+class User
+	var name;
+	var nick;
+	
+	var buddyList[];
+	var chatroomList[];
+	
+	var status; //online, idle, away, invisible, offline, notfriend
+	
+	var roomStatus[]; //typing, focused, blurred, notfriend
+	var roomPrivilege[]; //admin, moderator, regular
+	
+	var clientID; //hides actual Session.IO client object
+	
+	var messageQueue[]; //stores messages to be delivered on connect
+	
+	User( name, clientID ) {
+		name = name;
+		nick = name;
+		buddyList = [];
+		chatroomList = [];
+		status = online;
+		roomStatus = [];
+		roomPrivelege = [];
+		clientID = clientID;
+	
+	changeStatus(newStatus);
+	changeRoomStatus(room, newStatus);
+	changeRoomPrivilege(room, newPrivilege);
+	
+	disconnect();
+	connect(clientID); //sends messageQueue to client as well.
+	
+	getStatus(user); //changes report based on the user requesting
+	getRoomStatus(user, chatroom);
+	getName(user);
+	getNick(user);
+	getBuddyList();
+	getChatroomList();
+	
+	isFriend(friend);
+	inRoom(chatroom);
+	
+	addFriend(user);
+	removeFriend(user);
+	
+	send( Response ); //sends Response to clientID, after checking if user is online
+	
+	ack( messageid ); //removes message from message queue
+	
+	getClientUser(user); //returns reduced class for client delivery to user
+	
+	
+class ClientUser {
+	var name;
+	var nick;
+	var status;
+	
+	var buddyList[]; //empty unless actual user's client requests the whole user with getMyUser
+	var chatroomList;
+	
+	var roomStatus[]; //calculated to only show rooms that the requesting user can see
+	var roomPrivilege[]; //same
+}
+	
+	
